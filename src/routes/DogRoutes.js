@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const { getTemperaments } = require("../controllers/TemperamentController");
 const {
   getAllBreeds,
   postBreed,
   deleteBreed,
   updateBreed,
   getBreedById,
+  searchBreed,
 } = require("../controllers/DogController");
 router.get("/", async (req, res) => {
   const { name } = req.query;
@@ -21,8 +23,45 @@ router.get("/", async (req, res) => {
     res.status(200).send(allBreed);
   }
 });
-
+router.get("/filterCreated", async (req, res) => {
+  const { created } = req.body;
+  let allBreeds = await getAllBreeds();
+  if (created === "create") {
+    copy = allBreeds.filter((b) => b.createdInDB);
+    console.log(copy);
+    if (copy.length > 0) {
+      res.status(200).send(copy);
+    } else {
+      res.status(400).send("There are not created");
+    }
+  } else if (created === "api") {
+    let copy = allBreeds.filter((b) => !b.createdInDB);
+    res.status(200).send(copy);
+  } else {
+    res.status(200).send(allBreeds);
+  }
+});
+router.get("/filterTemperament", async (req, res) => {
+  const { temperament } = req.body;
+  let allBreeds = await getAllBreeds();
+  if (temperament) {
+    let tempName = allBreeds.filter((b) => {
+      if (typeof b.temperaments === "string")
+        return b.temperaments.includes(temperament);
+      if (Array.isArray(b.temperaments)) {
+        let temps = b.temperaments.map((e) => (e.name ? e.name : e));
+        return temps.includes(temperament);
+      }
+    });
+    tempName
+      ? res.status(200).send(tempName)
+      : res.status(404).send("Breed not found");
+  } else {
+    res.status(200).send(allBreeds);
+  }
+});
 router.get("/:id", getBreedById);
+router.get("/search", searchBreed);
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;

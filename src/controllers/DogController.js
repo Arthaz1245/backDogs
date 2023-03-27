@@ -1,4 +1,5 @@
 const Dog = require("../models/Breed");
+//const Temperament = require("../models/Temperament");
 const axios = require("axios");
 const { API_KEY } = process.env;
 const getApiInfo = async () => {
@@ -41,7 +42,6 @@ const getApiInfo = async () => {
     console.log(error);
   }
 };
-
 const getDbInfo = async () => {
   try {
     const dbInfo = await Dog.find();
@@ -84,6 +84,19 @@ const deleteBreed = async (id) => {
     console.log(error);
   }
 };
+const searchBreed = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({ message: "Names parameter is missing" });
+    }
+    const dog = Dog.find({ name: { $in: q } });
+    return res.json(dog);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 const updateBreed = async (id, data) => {
   const updatedBreed = await Dog.findByIdAndUpdate(id, data, {
@@ -119,6 +132,7 @@ const postBreed = async (req, res) => {
         image,
         temperaments,
       });
+
       const breedCreated = await newBreed.save();
       res.status(200).json(breedCreated);
     } else {
@@ -134,4 +148,6 @@ module.exports = {
   deleteBreed,
   updateBreed,
   getBreedById,
+
+  searchBreed,
 };
