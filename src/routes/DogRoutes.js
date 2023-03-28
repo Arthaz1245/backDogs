@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { getTemperaments } = require("../controllers/TemperamentController");
+
 const {
   getAllBreeds,
   postBreed,
@@ -12,6 +12,7 @@ const {
 router.get("/", async (req, res) => {
   const { name } = req.query;
   let allBreed = await getAllBreeds();
+
   if (name) {
     let breedName = allBreed.filter((p) =>
       p.name.toLowerCase().includes(name.toLowerCase())
@@ -24,15 +25,15 @@ router.get("/", async (req, res) => {
   }
 });
 router.get("/filterCreated", async (req, res) => {
-  const { created } = req.body;
+  const { created } = req.query;
   let allBreeds = await getAllBreeds();
   if (created === "create") {
     copy = allBreeds.filter((b) => b.createdInDB);
-    console.log(copy);
+
     if (copy.length > 0) {
       res.status(200).send(copy);
     } else {
-      res.status(400).send("There are not created");
+      res.status(400).send([]);
     }
   } else if (created === "api") {
     let copy = allBreeds.filter((b) => !b.createdInDB);
@@ -42,7 +43,7 @@ router.get("/filterCreated", async (req, res) => {
   }
 });
 router.get("/filterTemperament", async (req, res) => {
-  const { temperament } = req.body;
+  const { temperament } = req.query;
   let allBreeds = await getAllBreeds();
   if (temperament) {
     let tempName = allBreeds.filter((b) => {
