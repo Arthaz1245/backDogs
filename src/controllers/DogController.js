@@ -61,7 +61,7 @@ const getBreedById = async (req, res) => {
   const { id } = req.params;
   const apiInfo = await getApiInfo();
   const dbInfo = await getDbInfo();
-  const totalInfo = apiInfo.concat(dbInfo);
+  const totalInfo = await getAllBreeds(); // await added here
   try {
     if (id) {
       let breedId = totalInfo.find(
