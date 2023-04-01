@@ -27,7 +27,7 @@ router.get("/", async (req, res) => {
 router.get("/filterCreated", async (req, res) => {
   const { created } = req.query;
   let allBreeds = await getAllBreeds();
-  if (created === "create") {
+  if (created === "created") {
     copy = allBreeds.filter((b) => b.createdInDB);
 
     if (copy.length > 0) {
