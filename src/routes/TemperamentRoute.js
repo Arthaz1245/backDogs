@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const router = Router();
-const Temperament = require("../models/temperament");
+const Temperament = require("../models/Temperament");
 const { getTemperaments } = require("../controllers/TemperamentController");
 
 router.get("/", async (req, res) => {

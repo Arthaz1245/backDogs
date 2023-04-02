@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const User = require("../models/User");
+const Breed = require("../models/Breed");
+const { getAllBreeds } = require("./DogController");
 const genAuthToken = require("../../utils/genAuthToken");
 
 const signing = async (req, res) => {
@@ -18,6 +20,32 @@ const signing = async (req, res) => {
   const token = genAuthToken(user);
   res.send(token);
 };
+const addFavoritesBreed = async (req, res) => {
+  const { breedId, userId } = req.body;
+  const breeds = await getAllBreeds();
+  if (breedId) {
+    let breed = breeds.find(
+      (b) => b.id === Number(breedId) || b.id === String(breedId)
+    );
+
+    const user = await User.findById(userId);
+
+    if (!breed) {
+      return res.status(400).send("Invalid breed. It doesn't exist");
+    }
+    if (!user.favorites.includes(breedId)) {
+      await user.updateOne({ $push: { favorites: breedId } });
+
+      res.status(200).json("Add to favorites");
+    } else {
+      await user.updateOne({ $pull: { favorites: breedId } });
+      res.status(200).json("Remove from favorites");
+    }
+  } else {
+    return res.status(400).send("Invalid there is not an id");
+  }
+};
 module.exports = {
   signing,
+  addFavoritesBreed,
 };
