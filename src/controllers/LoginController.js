@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const User = require("../models/User");
-const Breed = require("../models/Breed");
+
 const { getAllBreeds } = require("./DogController");
 const genAuthToken = require("../../utils/genAuthToken");
 
@@ -33,13 +33,42 @@ const addFavoritesBreed = async (req, res) => {
     if (!breed) {
       return res.status(400).send("Invalid breed. It doesn't exist");
     }
-    if (!user.favorites.includes(breedId)) {
-      await user.updateOne({ $push: { favorites: breedId } });
-
+    const included = user.favorites.filter(
+      (b) => b.id === Number(breedId) || b.id === String(breedId)
+    );
+    if (!included.length) {
+      await user.updateOne({ $push: { favorites: breed } });
+      console.log(user.favorites);
       res.status(200).json("Add to favorites");
     } else {
-      await user.updateOne({ $pull: { favorites: breedId } });
+      return res.status(400).send("Invalid already added");
+    }
+  } else {
+    return res.status(400).send("Invalid there is not an id");
+  }
+};
+const removeFavoriteBreed = async (req, res) => {
+  const { breedId, userId } = req.body;
+  const breeds = await getAllBreeds();
+  if (breedId) {
+    let breed = breeds.find(
+      (b) => b.id === Number(breedId) || b.id === String(breedId)
+    );
+
+    const user = await User.findById(userId);
+
+    if (!breed) {
+      return res.status(400).send("Invalid breed. It doesn't exist");
+    }
+    const included = user.favorites.filter(
+      (b) => b.id === Number(breedId) || b.id === String(breedId)
+    );
+
+    if (included.length) {
+      await user.updateOne({ $pull: { favorites: breed } });
       res.status(200).json("Remove from favorites");
+    } else {
+      return res.status(400).send("Invalid already remove");
     }
   } else {
     return res.status(400).send("Invalid there is not an id");
@@ -48,4 +77,5 @@ const addFavoritesBreed = async (req, res) => {
 module.exports = {
   signing,
   addFavoritesBreed,
+  removeFavoriteBreed,
 };
