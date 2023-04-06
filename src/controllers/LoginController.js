@@ -74,8 +74,15 @@ const removeFavoriteBreed = async (req, res) => {
     return res.status(400).send("Invalid there is not an id");
   }
 };
+const getFavoritesByUser = async (req, res) => {
+  const { userId } = req.body;
+  const user = await User.findById(userId);
+  const userFavorite = user.favorites;
+  return res.status(200).json(userFavorite);
+};
 module.exports = {
   signing,
   addFavoritesBreed,
   removeFavoriteBreed,
+  getFavoritesByUser,
 };
