@@ -21,21 +21,23 @@ const signing = async (req, res) => {
   res.send(token);
 };
 const addFavoritesBreed = async (req, res) => {
-  const { breedId, userId } = req.body;
-  const breeds = await getAllBreeds();
+  const { userId, breed } = req.body;
+  const breedId = breed.id ? breed.id : breed._id;
+  const breedsDatabase = await getAllBreeds();
   if (breedId) {
-    let breed = breeds.find(
+    let breedExist = breedsDatabase.find(
       (b) => b.id === Number(breedId) || b.id === String(breedId)
     );
 
     const user = await User.findById(userId);
 
-    if (!breed) {
+    if (!breedExist) {
       return res.status(400).send("Invalid breed. It doesn't exist");
     }
     const included = user.favorites.filter(
       (b) => b.id === Number(breedId) || b.id === String(breedId)
     );
+    console.log(included.length);
     if (!included.length) {
       await user.updateOne({ $push: { favorites: breed } });
       console.log(user.favorites);
@@ -48,22 +50,24 @@ const addFavoritesBreed = async (req, res) => {
   }
 };
 const removeFavoriteBreed = async (req, res) => {
-  const { breedId, userId } = req.body;
-  const breeds = await getAllBreeds();
+  const { userId, breed } = req.body;
+  const breedId = breed.id ? breed.id : breed._id;
+  const breedsDatabase = await getAllBreeds();
+
   if (breedId) {
-    let breed = breeds.find(
+    let breedExist = breedsDatabase.find(
       (b) => b.id === Number(breedId) || b.id === String(breedId)
     );
 
     const user = await User.findById(userId);
 
-    if (!breed) {
+    if (!breedExist) {
       return res.status(400).send("Invalid breed. It doesn't exist");
     }
     const included = user.favorites.filter(
       (b) => b.id === Number(breedId) || b.id === String(breedId)
     );
-
+    console.log(included.length);
     if (included.length) {
       await user.updateOne({ $pull: { favorites: breed } });
       res.status(200).json("Remove from favorites");
