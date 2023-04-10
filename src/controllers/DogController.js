@@ -117,7 +117,9 @@ const postBreed = async (req, res) => {
       temperaments,
     } = req.body;
     const allBreeds = await getAllBreeds();
-    const isBreed = allBreeds.find((e) => e.name === name.toLowerCase());
+    const isBreed = allBreeds.find(
+      (e) => e.name.toLowerCase() === name.toLowerCase()
+    );
     if (!isBreed) {
       const newBreed = new Dog({
         name,

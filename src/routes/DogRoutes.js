@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
     let breedName = allBreed.filter((p) =>
       p.name.toLowerCase().includes(name.toLowerCase())
     );
-    breedName
+    breedName.length
       ? res.status(200).send(breedName)
       : res.status(404).send("Breed not found");
   } else {
