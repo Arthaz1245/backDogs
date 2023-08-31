@@ -55,6 +55,7 @@ const getAllBreeds = async (req, res) => {
   const apiInfo = await getApiInfo();
   const dbInfo = await getDbInfo();
   const totalInfo = apiInfo.concat(dbInfo);
+  console.log(totalInfo);
   return totalInfo;
 };
 const getBreedById = async (req, res) => {
